@@ -1,0 +1,42 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void)
+{
+    // Setze PB1 und PB2 als Ausgänge (für PWM)
+    DDRB |= (1 << PB1) | (1 << PB2);
+
+    // Timer 1 Konfiguration für PB1 (OC1A)
+    TCCR1B |= (1 << CS00); // prescaler = 1
+    OCR1A = 50;  // Setze die PWM Periode für PB1
+    OCR1B = 50;  // Setze die PWM Periode für PB1
+    TCCR1A |= (1 << WGM11); // Fast PWM Mode
+    TCCR1A |= (1 << COM1A1) | (1 << COM1A0); // Set OC1A on match, clear on top
+    TCCR1A |= (1 << COM1B1) | (1 << COM1B0); // Set OC1B on match, clear on top
+
+    // Timer 0 Konfiguration für PB2 (OC0A)
+    TCCR0A |= (1 << WGM00) | (1 << WGM01); // Fast PWM Mode
+    TCCR0A |= (1 << COM0A1) | (1 << COM0A0); // Set OC0A on match, clear on top
+    TCCR0B |= (1 << CS00); // prescaler = 1
+    OCR0A = 50;  // Setze die PWM Periode für PB2
+
+    // Setze Port C (PC0 bis PC5) und Port D (PD3 bis PD7) als Ausgänge
+    DDRC = 0x3F;  // PC0 bis PC5 als Ausgang
+    DDRD = 0xF8;  // PD3 bis PD7 als Ausgang (PD0 bis PD2 bleiben Eingang)
+
+    // Initialisiere die Ports mit 0 (alle LEDs aus)
+    PORTC = 0x00;
+    PORTD = 0x00;
+
+    // Unendliche Schleife
+    while (1)
+    {
+        // Zähle für Port C (PC0 bis PC5)
+        PORTC++;  // Inkrementiere PORTC
+        // Zähle für Port D (PD3 bis PD7)
+        PORTD++;  // Inkrementiere PORTD
+        _delay_ms(50);  // Warte für 50ms
+    }
+
+    return 0;  // Dies wird nie erreicht
+}
